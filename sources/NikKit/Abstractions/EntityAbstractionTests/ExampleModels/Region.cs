@@ -1,7 +1,7 @@
-using EntityAbstraction;
-using EntityAbstraction.Abstractions;
+using NikKit.EntityAbstraction;
+using NikKit.EntityAbstraction.Abstractions;
 
-namespace EntityAbstractionTests.Models;
+namespace NikKit.EntityAbstractionTests.ExampleModels;
 
 // Уровень 3 (Самый глубокий)
 public record CityIdentity(string Name, string PostCode) : IEntityIdentity

@@ -1,7 +1,7 @@
 using AutoBogus;
-using EntityAbstractionTests.Models;
+using NikKit.EntityAbstractionTests.ExampleModels;
 
-namespace EntityAbstractionTests.AbstractionTests;
+namespace NikKit.EntityAbstractionTests.AbstractionTests;
 
 public class IdentityTests
 {

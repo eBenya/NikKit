@@ -5,5 +5,6 @@
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
         <Version>0.0.1</Version>
+        <RootNamespace>$(SolutionName).$(MSBuildProjectName)</RootNamespace>
     </PropertyGroup>
 </Project>

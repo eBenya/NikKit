@@ -1,7 +1,7 @@
-using EntityAbstraction;
-using EntityAbstractionTests.Models;
+using NikKit.EntityAbstraction;
+using NikKit.EntityAbstractionTests.ExampleModels;
 
-namespace EntityAbstractionTests;
+namespace NikKit.EntityAbstractionTests;
 
 public class EntityHelpersTests
 {

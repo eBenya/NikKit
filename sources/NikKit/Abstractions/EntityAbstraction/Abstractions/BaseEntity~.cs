@@ -1,4 +1,4 @@
-﻿namespace EntityAbstraction.Abstractions;
+﻿namespace NikKit.EntityAbstraction.Abstractions;
 
 public abstract record BaseEntity<TIdentity> : BaseEntity
     where TIdentity : IEntityIdentity

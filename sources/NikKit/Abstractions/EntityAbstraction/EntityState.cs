@@ -1,4 +1,4 @@
-namespace EntityAbstraction;
+namespace NikKit.EntityAbstraction;
 
 public enum EntityState
 {

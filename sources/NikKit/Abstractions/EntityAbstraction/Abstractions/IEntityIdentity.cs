@@ -1,4 +1,4 @@
-﻿namespace EntityAbstraction.Abstractions;
+﻿namespace NikKit.EntityAbstraction.Abstractions;
 
 public interface IEntityIdentity
 {

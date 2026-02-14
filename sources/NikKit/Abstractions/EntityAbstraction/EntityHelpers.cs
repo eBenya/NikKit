@@ -1,6 +1,6 @@
-﻿using EntityAbstraction.Abstractions;
+﻿using NikKit.EntityAbstraction.Abstractions;
 
-namespace EntityAbstraction;
+namespace NikKit.EntityAbstraction;
 
 public static class EntityHelpers
 {
