@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Abstractions/">
+    <Project Path="Abstractions/EntityAbstraction/EntityAbstraction.csproj" />
+    <Project Path="Abstractions/EntityAbstractionTests/EntityAbstractionTests.csproj" />
+  </Folder>
+  <Folder Name="/_SolutionItems/">
+    <File Path="../../.gitignore" />
+    <File Path="../../LICENSE" />
+    <File Path="../../README.md" />
+    <File Path="Common.targets" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+</Solution>
