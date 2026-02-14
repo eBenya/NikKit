@@ -44,7 +44,7 @@ public static class EntityHelpers
         foreach (var newEntry in newEntitiesDict.Values)
         {
             var entityToAdd = mapBeforeAdd != null ? mapBeforeAdd(newEntry) : newEntry;
-            currentEntities.Add(entityToAdd with { Id = default });
+            currentEntities.Add(entityToAdd with { Id = Guid.Empty });
         }
     }
 }
