@@ -4,6 +4,10 @@
     <Project Path="Abstractions/EntityAbstractionTests/EntityAbstractionTests.csproj" />
     <Project Path="Abstractions/FactoryAbstraction/FactoryAbstraction.csproj" />
   </Folder>
+  <Folder Name="/IEnumerable/">
+    <Project Path="IEnumerableExtensions/IEnumerableExtensions/IEnumerableExtensions.csproj" />
+    <Project Path="IEnumerableExtensions/IEnumerableExtensionsTests/IEnumerableExtensionsTests.csproj" />
+  </Folder>
   <Folder Name="/_SolutionItems/">
     <File Path="../../.gitignore" />
     <File Path="../../LICENSE" />
