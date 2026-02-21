@@ -269,4 +269,19 @@ public class EntityHelpersTests
         var region = country.Regions.First();
         Assert.Equal(EntityState.Deleted, region.State);
     }
+    [Fact]
+    public void Merge_Add_Should_Modify_Same_Collection_Instance()
+    {
+        // Arrange
+        List<Country> original = [];
+        var sut = original;
+        
+        List<Country> incoming = [ CreateCountry("FR") ];
+
+        // Act
+        sut.Merge<Country, CountryIdentity>(incoming, _now);
+
+        // Assert
+        Assert.Same(sut, original);
+    }
 }
