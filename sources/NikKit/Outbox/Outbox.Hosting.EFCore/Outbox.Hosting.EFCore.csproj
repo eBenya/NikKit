@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\..\Common.targets" />
+    <ItemGroup>
+      <ProjectReference Include="..\Outbox.Abstraction\Outbox.Abstraction.csproj" />
+      <ProjectReference Include="..\Outbox.Hosting\Outbox.Hosting.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    </ItemGroup>
+
+</Project>
