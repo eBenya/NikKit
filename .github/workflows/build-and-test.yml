@@ -1,0 +1,49 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore "sources/NikKit/NikKit.slnx"
+
+      - name: Build
+        run: dotnet build "sources/NikKit/NikKit.slnx" --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test "sources/NikKit/NikKit.slnx" --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+      - name: Pack NuGet packages (only IsPackable=true projects)
+        run: dotnet pack "sources/NikKit/NikKit.slnx" --no-build --configuration Release --output ./nupkg
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-artifacts
+          path: |
+            **/bin/Release/
+            ./nupkg/*.nupkg
+          retention-days: 30
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: '**/TestResults/'
+          retention-days: 30

@@ -7,4 +7,34 @@
         <Version>0.0.1</Version>
         <RootNamespace>$(SolutionName).$(MSBuildProjectName)</RootNamespace>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <!-- NuGet Package Settings -->
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
+        <PackageId>NikKit.$(MSBuildProjectName)</PackageId>
+        <Title>NikKit.$(MSBuildProjectName)</Title>
+        <Authors>eBenya</Authors>
+        <Description>Part of NikKit library</Description>
+        <PackageProjectUrl>https://github.com/eBenya/NikKit</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/eBenya/NikKit</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+        <PackageTags>nikkit;utilities;extensions</PackageTags>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+        <!-- Exclude Test Projects -->
+        <IsTestProject>false</IsTestProject>
+    </PropertyGroup>
+
+    <!-- Don't pack test projects -->
+    <PropertyGroup Condition="$(MSBuildProjectName.Contains('Tests'))">
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(MSBuildProjectName.Contains('Outbox.Hosting.EFCore'))">
+        <IsPackable>false</IsPackable>
+        <IsTestProject>false</IsTestProject>
+    </PropertyGroup>
 </Project>

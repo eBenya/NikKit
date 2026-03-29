@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NikKit.Outbox.Abstraction;
 using NikKit.Outbox.Hosting.EFCore.Repository;
 
@@ -53,9 +54,10 @@ public static class OutboxServiceCollectionExtensions
     public static IServiceCollection AddOutboxJob<TDbContext>(this IServiceCollection services, IConfiguration configuration)
         where TDbContext : DbContext
     {
-        services.AddOutboxJob<OutboxRepository>(configuration);
+        var options = configuration.GetSection(OutboxOptions.SectionName).Get<OutboxOptions>() ?? new OutboxOptions();
+        //services.AddOutboxJob<OutboxRepository>(configuration);
         services.AddScoped<IOutboxRepository, OutboxRepository>(sp =>
-            new OutboxRepository(sp.GetRequiredService<TDbContext>()));
+            new OutboxRepository(sp.GetRequiredService<TDbContext>(), Options.Create(options)));
         return services;
     }
 }

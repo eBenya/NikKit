@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\Common.targets" />
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    
     <ItemGroup>
       <ProjectReference Include="..\Outbox.Abstraction\Outbox.Abstraction.csproj" />
       <ProjectReference Include="..\Outbox.Hosting\Outbox.Hosting.csproj" />

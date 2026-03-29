@@ -1,0 +1,174 @@
+name: Publish to NuGet
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump-type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Extract current version from Common.targets
+        id: current-version
+        run: |
+          CURRENT_VERSION=$(grep -oP '<Version>\K[^<]+' sources/NikKit/Common.targets)
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "📌 Current version: $CURRENT_VERSION"
+
+      - name: Bump version (patch)
+        if: github.event.inputs.bump-type == 'patch'
+        id: bump-patch
+        run: |
+          CURRENT="${{ steps.current-version.outputs.current_version }}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "⬆️ Bumped to: $NEW_VERSION"
+
+      - name: Bump version (minor)
+        if: github.event.inputs.bump-type == 'minor'
+        id: bump-minor
+        run: |
+          CURRENT="${{ steps.current-version.outputs.current_version }}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          MINOR=$((MINOR + 1))
+          PATCH=0
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "⬆️ Bumped to: $NEW_VERSION"
+
+      - name: Bump version (major)
+        if: github.event.inputs.bump-type == 'major'
+        id: bump-major
+        run: |
+          CURRENT="${{ steps.current-version.outputs.current_version }}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+          MAJOR=$((MAJOR + 1))
+          MINOR=0
+          PATCH=0
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "⬆️ Bumped to: $NEW_VERSION"
+
+      - name: Determine new version
+        id: new-version
+        run: |
+          if [ "${{ github.event.inputs.bump-type }}" = "patch" ]; then
+            NEW_VERSION="${{ steps.bump-patch.outputs.new_version }}"
+          elif [ "${{ github.event.inputs.bump-type }}" = "minor" ]; then
+            NEW_VERSION="${{ steps.bump-minor.outputs.new_version }}"
+          else
+            NEW_VERSION="${{ steps.bump-major.outputs.new_version }}"
+          fi
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update version in Common.targets
+        run: |
+          sed -i 's/<Version>.*<\/Version>/<Version>${{ steps.new-version.outputs.new_version }}<\/Version>/' sources/NikKit/Common.targets
+          echo "✅ Updated Common.targets to version ${{ steps.new-version.outputs.new_version }}"
+          grep "Version" sources/NikKit/Common.targets
+
+      - name: Restore dependencies
+        run: dotnet restore "sources/NikKit/NikKit.slnx"
+
+      - name: Build
+        run: dotnet build "sources/NikKit/NikKit.slnx" --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test "sources/NikKit/NikKit.slnx" --no-build --configuration Release --verbosity normal
+
+      - name: Pack NuGet packages
+        run: dotnet pack "sources/NikKit/NikKit.slnx" --no-build --configuration Release --output ./nupkg
+
+      - name: Generate package list
+        id: packages
+        run: |
+          echo "package_list<<EOF" >> $GITHUB_OUTPUT
+          ls -1 ./nupkg/*.nupkg | sed 's|^.*/||; s|\.[0-9]*\.[0-9]*\.[0-9]*\.nupkg$||' | sed 's/^/- /' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: List packages
+        run: |
+          echo "📦 Generated packages:"
+          echo "${{ steps.packages.outputs.package_list }}"
+
+      - name: Publish to NuGet
+        run: dotnet nuget push ./nupkg/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Commit version update
+        run: |
+          git add sources/NikKit/Common.targets
+          git commit -m "🔖 Bump version to ${{ steps.new-version.outputs.new_version }}"
+
+      - name: Create and push git tag
+        run: |
+          git tag -a v${{ steps.new-version.outputs.new_version }} -m "Release version ${{ steps.new-version.outputs.new_version }}"
+          git push origin main
+          git push origin v${{ steps.new-version.outputs.new_version }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.new-version.outputs.new_version }}
+          name: Release ${{ steps.new-version.outputs.new_version }}
+          body: |
+            ## 📦 NuGet Release v${{ steps.new-version.outputs.new_version }}
+            
+            ### Published Packages
+            ${{ steps.packages.outputs.package_list }}
+            
+            ### Installation
+            ```bash
+            dotnet add package NikKit.IEnumerableExtensions --version ${{ steps.new-version.outputs.new_version }}
+            ```
+          files: ./nupkg/*.nupkg
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload packages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages-${{ steps.new-version.outputs.new_version }}
+          path: ./nupkg/
+          retention-days: 90
+
+      - name: Success Summary
+        run: |
+          echo "✅ Publishing complete!"
+          echo ""
+          echo "📌 Version: ${{ steps.new-version.outputs.new_version }}"
+          echo "🏷️ Tag: v${{ steps.new-version.outputs.new_version }}"
+          echo ""
+          echo "📦 Published Packages:"
+          echo "${{ steps.packages.outputs.package_list }}"
+          echo ""
+          echo "📦 Files:"
+          echo "${{ steps.packages.outputs.package_files }}"

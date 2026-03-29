@@ -22,4 +22,8 @@
     <File Path="Common.targets" />
     <File Path="Directory.Packages.props" />
   </Folder>
+  <Folder Name="/_SolutionItems/workflows/">
+    <File Path="../../.github/workflows/build-and-test.yml" />
+    <File Path="../../.github/workflows/publish-nuget.yml" />
+  </Folder>
 </Solution>
