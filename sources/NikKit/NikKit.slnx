@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Abstractions/">
+    <Project Path="Abstractions/DomainExceptions/DomainExceptions.csproj" />
     <Project Path="Abstractions/EntityAbstraction/EntityAbstraction.csproj" />
     <Project Path="Abstractions/EntityAbstractionTests/EntityAbstractionTests.csproj" />
     <Project Path="Abstractions/FactoryAbstraction/FactoryAbstraction.csproj" />
