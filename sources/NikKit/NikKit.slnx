@@ -9,6 +9,9 @@
     <Project Path="IEnumerableExtensions/IEnumerableExtensions/IEnumerableExtensions.csproj" />
     <Project Path="IEnumerableExtensions/IEnumerableExtensionsTests/IEnumerableExtensionsTests.csproj" />
   </Folder>
+  <Folder Name="/Outbox/">
+    <Project Path="Outbox/Outbox.Abstraction/Outbox.Abstraction.csproj" />
+  </Folder>
   <Folder Name="/_SolutionItems/">
     <File Path="../../.gitignore" />
     <File Path="../../LICENSE" />
