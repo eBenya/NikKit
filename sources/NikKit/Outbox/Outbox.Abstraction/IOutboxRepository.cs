@@ -5,6 +5,9 @@
 /// </summary>
 public interface IOutboxRepository
 {
+    public string CleanupPolicy { get; }
+    public bool UseExternalUnitOfWork { get; }
+    
     Task<List<OutboxMessage>> GetUnprocessedMessagesAsync(int batchSize, CancellationToken ctk = default);
     Task MarkAsCompletedAsync(IEnumerable<Guid> ids, CancellationToken ctk);
     Task MarkAsFailedAsync(IEnumerable<OutboxFailureUpdate> failed, CancellationToken ctk);
