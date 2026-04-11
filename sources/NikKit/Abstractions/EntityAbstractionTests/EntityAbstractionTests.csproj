@@ -24,4 +24,10 @@
       <ProjectReference Include="..\EntityAbstraction\EntityAbstraction.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="EntityHelperTests_MappBeforeAdd.cs">
+        <DependentUpon>EntityHelperTests.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

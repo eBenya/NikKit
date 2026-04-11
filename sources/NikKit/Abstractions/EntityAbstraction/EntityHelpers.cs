@@ -10,7 +10,7 @@ public static class EntityHelpers
         DateTime updated,
         Func<TEntity, TEntity>? mapBeforeAdd = null,
         bool updateNested = false)
-        where TEntity : BaseEntity<TIdentity>, IUpdatableEntity<TEntity>
+        where TEntity : BaseEntity<TEntity, TIdentity>, IUpdatableEntity<TEntity>
         where TIdentity : IEntityIdentity
     {
         if (currentEntities == null) { return; }
@@ -43,8 +43,32 @@ public static class EntityHelpers
         // Добавляем те новые сущности, которых вообще не было в базе по Identity
         foreach (var newEntry in newEntitiesDict.Values)
         {
-            var entityToAdd = mapBeforeAdd != null ? mapBeforeAdd(newEntry) : newEntry;
-            currentEntities.Add(entityToAdd with { Id = Guid.Empty });
+            var entityToAdd = newEntry.PrepareForAddCascade<TEntity, TIdentity>(mapBeforeAdd, updateNested);
+            currentEntities.Add(entityToAdd);
         }
+    }
+
+    private static TEntity PrepareForAddCascade<TEntity, TIdentity>(this TEntity newEntity,
+        Func<TEntity, TEntity>? mapBeforeAdd,
+        bool updateNested)
+        where TEntity : BaseEntity<TEntity, TIdentity>, IUpdatableEntity<TEntity>
+        where TIdentity : IEntityIdentity
+    {
+        // Добавляем пользовательскую настройку маппинга
+        var entity = mapBeforeAdd != null ? mapBeforeAdd(newEntity) : newEntity;
+
+        // Перестраховка для новых объектов, что бы EF понял что нужно Insert
+        if(entity.Id != Guid.Empty)
+        {
+            entity = entity with { Id = Guid.Empty };
+        }
+
+        // Повторяем для вложенных объектов
+        if(updateNested)
+        {
+            entity = entity.MatchNestedForAdd();
+        }
+
+        return entity;
     }
 }
